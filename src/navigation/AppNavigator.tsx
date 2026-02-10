@@ -36,12 +36,12 @@ export default function AppNavigator() {
       <Stack.Screen
         name="RoundResults"
         component={RoundResultsScreen}
-        options={{ title: 'Round Results' }}
+        options={{ title: 'Round Results', headerLeft: () => null }}
       />
       <Stack.Screen
         name="Scoreboard"
         component={ScoreboardScreen}
-        options={{ title: 'Scoreboard' }}
+        options={{ title: 'Scoreboard', headerLeft: () => null }}
       />
     </Stack.Navigator>
   );

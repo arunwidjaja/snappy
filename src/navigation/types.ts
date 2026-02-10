@@ -11,11 +11,16 @@ export type GameState = GameRulesParams & {
   scores: number[];
 };
 
+export type PlayedWord = {
+  word: string;
+  gotIt: boolean;
+};
+
 export type RootStackParamList = {
   Home: undefined;
   AddTeams: undefined;
   GameRules: { teams: string[] };
   Gameplay: GameState;
-  RoundResults: GameState & { roundScore: number };
+  RoundResults: GameState & { playedWords: PlayedWord[] };
   Scoreboard: { teams: string[]; scores: number[] };
 };

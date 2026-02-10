@@ -6,7 +6,7 @@ import { RootStackParamList } from '../navigation/types';
 type Props = NativeStackScreenProps<RootStackParamList, 'GameRules'>;
 
 const SCORE_LIMITS = [15, 25, 35, 45, 55, 65, 75];
-const DURATIONS = [30, 45, 60, 90, 120];
+const DURATIONS = [5, 10, 30, 45, 60, 90, 120];
 const SKIP_PENALTIES = [0, 1, 2, 3];
 const FREE_SKIPS = [0, 1, 2, 3, 5];
 

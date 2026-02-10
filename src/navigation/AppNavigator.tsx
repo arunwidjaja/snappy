@@ -2,7 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
 import HomeScreen from '../screens/HomeScreen';
-import GameSetupScreen from '../screens/GameSetupScreen';
+import AddTeamsScreen from '../screens/AddTeamsScreen';
+import GameRulesScreen from '../screens/GameRulesScreen';
 import GameplayScreen from '../screens/GameplayScreen';
 import RoundResultsScreen from '../screens/RoundResultsScreen';
 import ScoreboardScreen from '../screens/ScoreboardScreen';
@@ -18,9 +19,14 @@ export default function AppNavigator() {
         options={{ title: 'Snappy' }}
       />
       <Stack.Screen
-        name="GameSetup"
-        component={GameSetupScreen}
-        options={{ title: 'Game Setup' }}
+        name="AddTeams"
+        component={AddTeamsScreen}
+        options={{ title: 'Add Teams' }}
+      />
+      <Stack.Screen
+        name="GameRules"
+        component={GameRulesScreen}
+        options={{ title: 'Game Rules' }}
       />
       <Stack.Screen
         name="Gameplay"

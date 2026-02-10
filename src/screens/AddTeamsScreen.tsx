@@ -23,6 +23,8 @@ let nextKey = 0;
 export default function AddTeamsScreen({ navigation }: Props) {
   const [teamName, setTeamName] = useState('');
   const [teams, setTeams] = useState<TeamItem[]>([]);
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
 
   const addTeam = () => {
     const trimmed = teamName.trim();
@@ -35,27 +37,67 @@ export default function AddTeamsScreen({ navigation }: Props) {
     setTeams((prev) => prev.filter((t) => t.key !== key));
   };
 
+  const startEditing = (item: TeamItem) => {
+    setEditingKey(item.key);
+    setEditValue(item.name);
+  };
+
+  const saveEdit = (key: string) => {
+    const trimmed = editValue.trim();
+    if (trimmed.length > 0) {
+      setTeams((prev) =>
+        prev.map((t) => (t.key === key ? { ...t, name: trimmed } : t)),
+      );
+    }
+    setEditingKey(null);
+    setEditValue('');
+  };
+
   const canContinue = teams.length >= 2;
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<TeamItem>) => (
-    <ScaleDecorator>
-      <TouchableOpacity
-        onLongPress={drag}
-        disabled={isActive}
-        style={[styles.teamRow, isActive && styles.teamRowActive]}
-      >
-        <Text style={styles.dragHandle}>{'\u2261'}</Text>
-        <Text style={styles.teamName}>{item.name}</Text>
-        <TouchableOpacity onPress={() => removeTeam(item.key)}>
-          <Text style={styles.removeBtn}>{'\u2715'}</Text>
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<TeamItem>) => {
+    const isEditing = editingKey === item.key;
+
+    return (
+      <ScaleDecorator>
+        <TouchableOpacity
+          onLongPress={drag}
+          disabled={isActive || isEditing}
+          style={[styles.teamRow, isActive && styles.teamRowActive]}
+        >
+          <Text style={styles.dragHandle}>{'\u2261'}</Text>
+
+          {isEditing ? (
+            <TextInput
+              style={[styles.teamName, styles.editInput]}
+              value={editValue}
+              onChangeText={setEditValue}
+              onSubmitEditing={() => saveEdit(item.key)}
+              onBlur={() => saveEdit(item.key)}
+              autoFocus
+              selectTextOnFocus
+            />
+          ) : (
+            <TouchableOpacity
+              style={styles.nameContainer}
+              onPress={() => startEditing(item)}
+            >
+              <Text style={styles.teamName}>{item.name}</Text>
+              <Text style={styles.editIcon}>{'\u270E'}</Text>
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity onPress={() => removeTeam(item.key)}>
+            <Text style={styles.removeBtn}>{'\u2715'}</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    </ScaleDecorator>
-  );
+      </ScaleDecorator>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Add Teams</Text>
+      <Text style={styles.heading}>Team Creation</Text>
 
       <View style={styles.inputRow}>
         <TextInput
@@ -74,6 +116,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
         renderItem={renderItem}
         onDragEnd={({ data }) => setTeams(data)}
         containerStyle={styles.list}
+        extraData={editingKey}
       />
 
       {!canContinue && teams.length > 0 && (
@@ -126,6 +169,14 @@ const styles = StyleSheet.create({
   },
   dragHandle: { fontSize: 22, color: '#999', marginRight: 12 },
   teamName: { fontSize: 16, flex: 1 },
+  nameContainer: { flex: 1, flexDirection: 'row', alignItems: 'center' },
+  editIcon: { fontSize: 14, color: '#999', marginLeft: 6 },
+  editInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#007AFF',
+    padding: 4,
+    fontSize: 16,
+  },
   removeBtn: { fontSize: 18, color: '#e33', paddingHorizontal: 8 },
   hint: { color: '#999', textAlign: 'center', marginBottom: 10 },
 });

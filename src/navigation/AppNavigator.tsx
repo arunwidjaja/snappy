@@ -7,6 +7,7 @@ import GameRulesScreen from '../screens/GameRulesScreen';
 import GameplayScreen from '../screens/GameplayScreen';
 import RoundResultsScreen from '../screens/RoundResultsScreen';
 import ScoreboardScreen from '../screens/ScoreboardScreen';
+import PauseScreen from '../screens/PauseScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -21,7 +22,7 @@ export default function AppNavigator() {
       <Stack.Screen
         name="AddTeams"
         component={AddTeamsScreen}
-        options={{ title: 'Add Teams' }}
+        options={{ title: 'Team Creation' }}
       />
       <Stack.Screen
         name="GameRules"
@@ -31,6 +32,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Gameplay"
         component={GameplayScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Pause"
+        component={PauseScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

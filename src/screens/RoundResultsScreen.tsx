@@ -21,7 +21,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   const currentTeam = teams[currentTeamIndex];
-  const roundScore = playedWords.filter(w => w.gotIt).length;
+  const roundScore = playedWords.reduce((sum, w) => sum + (w.guessed ? w.value : 0), 0);
   const updatedScores = scores.map((s, i) =>
     i === currentTeamIndex ? s + roundScore : s,
   );
@@ -31,14 +31,14 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
 
   const toggleWord = (index: number) => {
     setPlayedWords(prev =>
-      prev.map((w, i) => (i === index ? { ...w, gotIt: !w.gotIt } : w)),
+      prev.map((w, i) => (i === index ? { ...w, guessed: !w.guessed } : w)),
     );
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>{currentTeam}'s Results</Text>
-      <Text style={styles.score}>Round Score: {roundScore}</Text>
+      <Text style={styles.score}>{roundScore}</Text>
       <FlatList
         data={playedWords}
         keyExtractor={(_, i) => String(i)}
@@ -48,20 +48,20 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
             <Text
               style={[
                 styles.wordText,
-                item.gotIt ? styles.gotItText : styles.skippedText,
+                item.guessed ? styles.guessedText : styles.skippedText,
               ]}
             >
-              {item.word}
+              {"(+" + `${item.value}` + ") "}{item.word}
             </Text>
             <TouchableOpacity
               style={[
                 styles.toggleButton,
-                item.gotIt ? styles.gotItButton : styles.skippedButton,
+                item.guessed ? styles.guessedButton : styles.skippedButton,
               ]}
               onPress={() => toggleWord(index)}
             >
               <Text style={styles.toggleButtonText}>
-                {item.gotIt ? 'Got It' : 'Skipped'}
+                {item.guessed ? 'Got It' : 'Skipped'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   wordText: { fontSize: 18, flex: 1 },
-  gotItText: { color: '#2e7d32' },
+  guessedText: { color: '#2e7d32' },
   skippedText: { color: '#c62828' },
   toggleButton: {
     paddingVertical: 6,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginLeft: 10,
   },
-  gotItButton: { backgroundColor: '#c8e6c9' },
+  guessedButton: { backgroundColor: '#c8e6c9' },
   skippedButton: { backgroundColor: '#ffcdd2' },
   toggleButtonText: { fontSize: 14, fontWeight: '600' },
   nextUp: { fontSize: 16, color: '#666', marginBottom: 15 },

@@ -13,7 +13,17 @@ export type GameState = GameRulesParams & {
 
 export type PlayedWord = {
   word: string;
-  gotIt: boolean;
+  value: number;
+  guessed: boolean;
+};
+
+export type PauseParams = {
+  currentTeam: string;
+  roundScore: number;
+  timeLeft: number;
+  duration: number;
+  teams: string[];
+  scores: number[];
 };
 
 export type RootStackParamList = {
@@ -21,6 +31,7 @@ export type RootStackParamList = {
   AddTeams: undefined;
   GameRules: { teams: string[] };
   Gameplay: GameState;
+  Pause: PauseParams;
   RoundResults: GameState & { playedWords: PlayedWord[] };
   Scoreboard: { teams: string[]; scores: number[] };
 };

@@ -24,6 +24,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
   const [playedWords, setPlayedWords] = useState<PlayedWord[]>([]);
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isFocused, setIsFocused] = useState(true);
+  const [countdown, setCountdown] = useState(3);
   const playedWordsRef = useRef<PlayedWord[]>([]);
 
   // Keep ref in sync so the timer callback always sees the latest list
@@ -40,6 +41,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
   useEffect(() => {
     const unsubFocus = navigation.addListener('focus', () => {
       setIsFocused(true);
+      setCountdown(3);
     });
     const unsubBlur = navigation.addListener('blur', () => {
       setIsFocused(false);
@@ -50,9 +52,20 @@ export default function GameplayScreen({ navigation, route }: Props) {
     };
   }, [navigation]);
 
-  // Countdown timer
+  // 3-2-1 countdown before gameplay begins
   useEffect(() => {
-    if (!isFocused) return;
+    if (!isFocused || countdown <= 0) return;
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isFocused, countdown]);
+
+  // Game timer (only runs after countdown finishes)
+  useEffect(() => {
+    if (!isFocused || countdown > 0) return;
 
     const interval = setInterval(() => {
       setTimeLeft(prev => {
@@ -65,7 +78,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isFocused]);
+  }, [isFocused, countdown]);
 
   // Navigate to results when time runs out
   useEffect(() => {
@@ -99,9 +112,16 @@ export default function GameplayScreen({ navigation, route }: Props) {
   const seconds = timeLeft % 60;
   const timerDisplay = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
+  if (countdown > 0) {
+    return (
+      <View style={styles.countdownContainer}>
+        <Text style={styles.countdownText}>{countdown}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.currentPlayer}>{currentPlayer}</Text>
       <Text style={styles.timer}>{timerDisplay}</Text>
 
       <View style={styles.wordContainer}>
@@ -205,5 +225,14 @@ const styles = StyleSheet.create({
   },
   pauseButtonText: {
     fontSize: 24,
+  },
+  countdownContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countdownText: {
+    fontSize: 96,
+    fontWeight: 'bold',
   },
 });

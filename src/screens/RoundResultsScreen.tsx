@@ -46,7 +46,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>{currentTeam}'s Results</Text>
+      <Text style={styles.heading}>Round Over!</Text>
       <Text style={styles.playerLabel}>{currentPlayer}</Text>
       <Text style={styles.score}>{roundScore}</Text>
       <FlatList
@@ -77,7 +77,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
           </View>
         )}
       />
-      <Text style={styles.nextUp}>Next up: {teams[nextTeamIndex]} — {nextPlayer}</Text>
+      <Text style={styles.nextUp}>Next up: {teams[nextTeamIndex]}</Text>
       <Button
         title="Next Round"
         onPress={() =>

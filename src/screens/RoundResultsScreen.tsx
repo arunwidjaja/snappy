@@ -21,8 +21,8 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   const currentTeam = teams[currentTeamIndex];
-  const originalSkipCount = initialWords.filter(w => !w.guessed).length;
-  const penaltySkips = freeSkips ? 0 : Math.max(0, originalSkipCount - freeSkipCount);
+  const skipCount = playedWords.filter(w => !w.guessed).length;
+  const penaltySkips = freeSkips ? 0 : Math.max(0, skipCount - freeSkipCount);
   const roundScore = playedWords.reduce((sum, w) => sum + (w.guessed ? w.value : 0), 0) - penaltySkips;
   const updatedScores = scores.map((s, i) =>
     i === currentTeamIndex ? s + roundScore : s,

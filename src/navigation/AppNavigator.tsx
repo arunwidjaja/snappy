@@ -6,7 +6,7 @@ import AddTeamsScreen from '../screens/Teams';
 import GameRulesScreen from '../screens/Rules';
 import GameplayScreen from '../screens/Game';
 import RoundResultsScreen from '../screens/RoundResultsScreen';
-import ScoreboardScreen from '../screens/Scoareboard';
+import ScoreboardScreen from '../screens/Scoreboard';
 import PauseScreen from '../screens/Pause';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

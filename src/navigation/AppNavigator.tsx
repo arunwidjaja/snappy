@@ -1,13 +1,13 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
-import HomeScreen from '../screens/HomeScreen';
-import AddTeamsScreen from '../screens/AddTeamsScreen';
-import GameRulesScreen from '../screens/GameRulesScreen';
-import GameplayScreen from '../screens/GameplayScreen';
+import HomeScreen from '../screens/Title';
+import AddTeamsScreen from '../screens/Teams';
+import GameRulesScreen from '../screens/Rules';
+import GameplayScreen from '../screens/Game';
 import RoundResultsScreen from '../screens/RoundResultsScreen';
-import ScoreboardScreen from '../screens/ScoreboardScreen';
-import PauseScreen from '../screens/PauseScreen';
+import ScoreboardScreen from '../screens/Scoareboard';
+import PauseScreen from '../screens/Pause';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -17,17 +17,17 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Home"
         component={HomeScreen}
-        options={{ title: 'Snappy' }}
+        options={{ headerShown: false}}
       />
       <Stack.Screen
         name="AddTeams"
         component={AddTeamsScreen}
-        options={{ title: 'Team Creation' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="GameRules"
         component={GameRulesScreen}
-        options={{ title: 'Game Rules' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Gameplay"
@@ -42,12 +42,12 @@ export default function AppNavigator() {
       <Stack.Screen
         name="RoundResults"
         component={RoundResultsScreen}
-        options={{ title: 'Round Results', headerLeft: () => null }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Scoreboard"
         component={ScoreboardScreen}
-        options={{ title: 'Scoreboard', headerLeft: () => null }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

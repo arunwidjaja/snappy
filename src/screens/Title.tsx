@@ -9,7 +9,6 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SNAPPY</Text>
-      <Text style={styles.subtitle}>a word guessing game</Text>
       <Button title="Play" onPress={() => navigation.navigate('AddTeams')} />
     </View>
   );

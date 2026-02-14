@@ -162,10 +162,7 @@ const styles = StyleSheet.create({
   teamRowActive: {
     backgroundColor: '#f0f0f0',
     elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.15)',
   },
   dragHandle: { fontSize: 22, color: '#999', marginRight: 12 },
   teamName: { fontSize: 16, flex: 1 },

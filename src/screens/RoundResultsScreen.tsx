@@ -51,7 +51,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
                 item.guessed ? styles.guessedText : styles.skippedText,
               ]}
             >
-              {"(+" + `${item.value}` + ") "}{item.word}
+              {"(" + `${item.value}` + ") "}{item.word}
             </Text>
             <TouchableOpacity
               style={[
@@ -61,7 +61,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
               onPress={() => toggleWord(index)}
             >
               <Text style={styles.toggleButtonText}>
-                {item.guessed ? 'Got It' : 'Skipped'}
+                {item.guessed ? 'Guessed' : 'Skipped'}
               </Text>
             </TouchableOpacity>
           </View>

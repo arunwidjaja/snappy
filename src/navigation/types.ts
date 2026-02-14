@@ -1,5 +1,6 @@
 export type GameRulesParams = {
   teams: string[];
+  players: string[][];
   scoreLimit: number;
   duration: number;
   freeSkips: boolean;
@@ -8,6 +9,7 @@ export type GameRulesParams = {
 
 export type GameState = GameRulesParams & {
   currentTeamIndex: number;
+  currentPlayerIndices: number[];
   scores: number[];
 };
 
@@ -19,15 +21,16 @@ export type PlayedWord = {
 
 export type PauseParams = {
   currentTeam: string;
+  currentPlayer: string;
   timeLeft: number;
 };
 
 export type RootStackParamList = {
   Home: undefined;
   AddTeams: undefined;
-  GameRules: { teams: string[] };
+  GameRules: { teams: string[]; players: string[][] };
   Gameplay: GameState;
   Pause: PauseParams;
   RoundResults: GameState & { playedWords: PlayedWord[] };
-  Scoreboard: { teams: string[]; scores: number[] };
+  Scoreboard: { teams: string[]; players: string[][]; scores: number[] };
 };

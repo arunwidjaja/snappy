@@ -15,9 +15,10 @@ function getRandomEntry(currentWord: string): WordEntry {
 }
 
 export default function GameplayScreen({ navigation, route }: Props) {
-  const { teams, currentTeamIndex, scores, scoreLimit, duration, freeSkips, freeSkipCount } =
+  const { teams, players, currentTeamIndex, currentPlayerIndices, scores, scoreLimit, duration, freeSkips, freeSkipCount } =
     route.params;
   const currentTeam = teams[currentTeamIndex];
+  const currentPlayer = players[currentTeamIndex][currentPlayerIndices[currentTeamIndex]];
 
   const [currentEntry, setCurrentEntry] = useState(() => getRandomEntry(''));
   const [playedWords, setPlayedWords] = useState<PlayedWord[]>([]);
@@ -71,7 +72,9 @@ export default function GameplayScreen({ navigation, route }: Props) {
     if (timeLeft === 0) {
       navigation.replace('RoundResults', {
         teams,
+        players,
         currentTeamIndex,
+        currentPlayerIndices,
         scores,
         scoreLimit,
         duration,
@@ -98,6 +101,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.currentPlayer}>{currentPlayer}</Text>
       <Text style={styles.timer}>{timerDisplay}</Text>
 
       <View style={styles.wordContainer}>
@@ -126,11 +130,8 @@ export default function GameplayScreen({ navigation, route }: Props) {
           onPress={() =>
             navigation.navigate('Pause', {
               currentTeam,
-              roundScore,
+              currentPlayer,
               timeLeft,
-              duration,
-              teams,
-              scores,
             })
           }
         >
@@ -149,6 +150,11 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
+  },
+  currentPlayer: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 4,
   },
   timer: {
     fontSize: 36,

@@ -206,6 +206,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
         onPress={() =>
           navigation.navigate('GameRules', {
             teams: teams.map((t) => t.name),
+            players: teams.map((t) => t.players),
           })
         }
       />

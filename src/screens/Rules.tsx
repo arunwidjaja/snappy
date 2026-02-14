@@ -122,7 +122,7 @@ function CyclePicker({
 }
 
 export default function GameRulesScreen({ navigation, route }: Props) {
-  const { teams } = route.params;
+  const { teams, players } = route.params;
 
   const [scoreLimit, setScoreLimit] = useState(45);
   const [duration, setDuration] = useState(60);
@@ -175,11 +175,13 @@ export default function GameRulesScreen({ navigation, route }: Props) {
           onPress={() =>
             navigation.navigate('Gameplay', {
               teams,
+              players,
               scoreLimit,
               duration,
               freeSkips,
               freeSkipCount,
               currentTeamIndex: 0,
+              currentPlayerIndices: teams.map(() => 0),
               scores: teams.map(() => 0),
             })
           }

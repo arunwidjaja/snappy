@@ -6,7 +6,7 @@ import { RootStackParamList } from '../navigation/types';
 type Props = NativeStackScreenProps<RootStackParamList, 'Pause'>;
 
 export default function PauseScreen({ navigation, route }: Props) {
-  const { currentTeam, timeLeft } = route.params;
+  const { currentTeam, currentPlayer, timeLeft } = route.params;
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   const minutes = Math.floor(timeLeft / 60);
@@ -15,7 +15,7 @@ export default function PauseScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.teamTurn}>{currentTeam}'s Turn</Text>
+      <Text style={styles.teamTurn}>{currentTeam}'s Turn — {currentPlayer}</Text>
       <Text style={styles.timer}>{timerDisplay}</Text>
       <View style={styles.buttonsSection}>
         <Button title="Resume" onPress={() => navigation.goBack()} />

@@ -8,7 +8,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'RoundResults'>;
 export default function RoundResultsScreen({ navigation, route }: Props) {
   const {
     teams,
+    players,
     currentTeamIndex,
+    currentPlayerIndices,
     scores,
     scoreLimit,
     duration,
@@ -21,13 +23,18 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   const currentTeam = teams[currentTeamIndex];
+  const currentPlayer = players[currentTeamIndex][currentPlayerIndices[currentTeamIndex]];
   const skipCount = playedWords.filter(w => !w.guessed).length;
   const penaltySkips = freeSkips ? 0 : Math.max(0, skipCount - freeSkipCount);
   const roundScore = playedWords.reduce((sum, w) => sum + (w.guessed ? w.value : 0), 0) - penaltySkips;
   const updatedScores = scores.map((s, i) =>
     i === currentTeamIndex ? s + roundScore : s,
   );
+  const updatedPlayerIndices = currentPlayerIndices.map((idx, i) =>
+    i === currentTeamIndex ? (idx + 1) % players[i].length : idx,
+  );
   const nextTeamIndex = (currentTeamIndex + 1) % teams.length;
+  const nextPlayer = players[nextTeamIndex][updatedPlayerIndices[nextTeamIndex]];
   const cycleComplete = nextTeamIndex === 0;
   const gameOver = cycleComplete && updatedScores.some(s => s >= scoreLimit);
 
@@ -40,6 +47,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>{currentTeam}'s Results</Text>
+      <Text style={styles.playerLabel}>{currentPlayer}</Text>
       <Text style={styles.score}>{roundScore}</Text>
       <FlatList
         data={playedWords}
@@ -69,18 +77,21 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
           </View>
         )}
       />
-      <Text style={styles.nextUp}>Next up: {teams[nextTeamIndex]}</Text>
+      <Text style={styles.nextUp}>Next up: {teams[nextTeamIndex]} — {nextPlayer}</Text>
       <Button
         title="Next Round"
         onPress={() =>
           gameOver
             ? navigation.navigate('Scoreboard', {
                 teams,
+                players,
                 scores: updatedScores,
               })
             : navigation.navigate('Gameplay', {
                 teams,
+                players,
                 currentTeamIndex: nextTeamIndex,
+                currentPlayerIndices: updatedPlayerIndices,
                 scores: updatedScores,
                 scoreLimit,
                 duration,
@@ -114,7 +125,8 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: 'center', padding: 20, paddingTop: 60 },
-  heading: { fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
+  heading: { fontSize: 28, fontWeight: 'bold', marginBottom: 4 },
+  playerLabel: { fontSize: 16, color: '#666', marginBottom: 10 },
   score: { fontSize: 24, fontWeight: 'bold', marginBottom: 15 },
   list: { width: '100%', flexGrow: 0, maxHeight: '50%', marginBottom: 15 },
   wordRow: {

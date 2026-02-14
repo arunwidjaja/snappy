@@ -32,7 +32,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
   const addTeam = () => {
     const trimmed = teamName.trim();
     if (trimmed.length === 0) return;
-    const players = Array.from({ length: newPlayerCount }, (_, i) => `${trimmed}\'s Player ${i + 1}`);
+    const players = Array.from({ length: newPlayerCount }, (_, i) => `Player ${i + 1}`);
     setTeams((prev) => [...prev, { key: String(nextKey++), name: trimmed, players }]);
     setTeamName(''); //reset text field
     setNewPlayerCount(2);

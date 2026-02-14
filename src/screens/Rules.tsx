@@ -173,7 +173,7 @@ export default function GameRulesScreen({ navigation, route }: Props) {
         <Button
           title="Start Game"
           onPress={() =>
-            navigation.navigate('Gameplay', {
+            navigation.navigate('ReadyUp', {
               teams,
               players,
               scoreLimit,

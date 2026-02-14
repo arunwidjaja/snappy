@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, PlayedWord } from '../navigation/types';
-import { WORDS, WordEntry } from '../data/words';
+import WORDS from '../data/words.json';
+
+type WordEntry = { word: string; value: number };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Gameplay'>;
 

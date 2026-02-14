@@ -87,7 +87,7 @@ export default function RoundResultsScreen({ navigation, route }: Props) {
                 players,
                 scores: updatedScores,
               })
-            : navigation.navigate('Gameplay', {
+            : navigation.navigate('ReadyUp', {
                 teams,
                 players,
                 currentTeamIndex: nextTeamIndex,

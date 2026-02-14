@@ -4,6 +4,7 @@ import { RootStackParamList } from './types';
 import HomeScreen from '../screens/Title';
 import AddTeamsScreen from '../screens/Teams';
 import GameRulesScreen from '../screens/Rules';
+import ReadyUpScreen from '../screens/ReadyUp';
 import GameplayScreen from '../screens/Game';
 import RoundResultsScreen from '../screens/RoundResultsScreen';
 import ScoreboardScreen from '../screens/Scoreboard';
@@ -27,6 +28,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="GameRules"
         component={GameRulesScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReadyUp"
+        component={ReadyUpScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

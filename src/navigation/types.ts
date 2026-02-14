@@ -29,6 +29,7 @@ export type RootStackParamList = {
   Home: undefined;
   AddTeams: undefined;
   GameRules: { teams: string[]; players: string[][] };
+  ReadyUp: GameState;
   Gameplay: GameState;
   Pause: PauseParams;
   RoundResults: GameState & { playedWords: PlayedWord[] };

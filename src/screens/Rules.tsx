@@ -21,7 +21,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'GameRules'>;
 
 const SCORE_LIMIT_VALUES = Array.from({ length: 999 }, (_, i) => i + 1);
 const DURATION_VALUES = Array.from({ length: 199 }, (_, i) => (i + 1) * 5);
-const FREE_SKIPS = [0, 1, 2, 3, 5];
+const FREE_SKIPS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const WHEEL_ITEM_HEIGHT = 44;
 const WHEEL_VISIBLE_ITEMS = 3;
@@ -75,21 +75,13 @@ function InlineWheelPicker({
           contentContainerStyle={{
             paddingVertical: WHEEL_PADDING,
           }}
-          renderItem={({ item }) => {
-            const isSelected = item === value;
-            return (
-              <View style={styles.wheelItem}>
-                <Text
-                  style={[
-                    styles.wheelItemText,
-                    isSelected && styles.wheelItemTextSelected,
-                  ]}
-                >
-                  {formatLabel(item)}
-                </Text>
-              </View>
-            );
-          }}
+          renderItem={({ item }) => (
+            <View style={styles.wheelItem}>
+              <Text style={styles.wheelItemText}>
+                {formatLabel(item)}
+              </Text>
+            </View>
+          )}
         />
       </View>
     </View>
@@ -145,7 +137,7 @@ export default function GameRulesScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.heading}>Game Rules</Text>
+      <Text variant="headlineMedium" style={styles.heading}>Rules</Text>
 
       <Surface style={styles.card} elevation={2}>
         <View style={styles.wheelsRow}>
@@ -172,12 +164,7 @@ export default function GameRulesScreen({ navigation, route }: Props) {
       <Surface style={styles.card} elevation={2}>
         <View style={styles.settingRow}>
           <View style={styles.settingRowInner}>
-            <View style={{ flex: 1 }}>
-              <Text variant="bodyLarge" style={styles.settingLabel}>Free Skips</Text>
-              <Text variant="bodySmall" style={styles.settingHint}>
-                {freeSkips ? 'Skips have no penalty' : `${freeSkipCount} free, then -1 per skip`}
-              </Text>
-            </View>
+            <Text variant="bodyLarge" style={styles.settingLabel}>Free Skips</Text>
             <Switch value={freeSkips} onValueChange={setFreeSkips} />
           </View>
         </View>
@@ -215,7 +202,7 @@ export default function GameRulesScreen({ navigation, route }: Props) {
             })
           }
         >
-          Start Game
+          Start
         </Button>
       </View>
     </View>
@@ -272,22 +259,15 @@ const styles = StyleSheet.create({
     height: WHEEL_ITEM_HEIGHT,
     backgroundColor: '#f3edf7',
     borderRadius: 12,
-    zIndex: 1,
   },
   wheelItem: {
     height: WHEEL_ITEM_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 2,
   },
   wheelItemText: {
     color: '#79747e',
     fontSize: 18,
-  },
-  wheelItemTextSelected: {
-    color: '#6750A4',
-    fontWeight: 'bold',
-    fontSize: 22,
   },
   settingRow: {
     paddingHorizontal: 16,
@@ -301,10 +281,6 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontWeight: '600',
     color: '#1c1b1f',
-  },
-  settingHint: {
-    color: '#79747e',
-    marginTop: 2,
   },
   divider: {
     marginHorizontal: 16,

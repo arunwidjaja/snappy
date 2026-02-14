@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text, Surface, IconButton } from 'react-native-paper';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 
@@ -13,11 +14,17 @@ export default function ReadyUpScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.info}>
-        <Text style={styles.teamName}>{currentTeam}</Text>
-        <Text style={styles.playerName}>{currentPlayer}'s Turn</Text>
-      </View>
-      <TouchableOpacity
+      <Surface style={styles.card} elevation={2}>
+        <Text variant="headlineLarge" style={styles.teamName}>{currentTeam}</Text>
+        <Text variant="titleLarge" style={styles.playerName}>{currentPlayer}'s Turn</Text>
+      </Surface>
+
+      <IconButton
+        icon="play"
+        mode="contained"
+        size={48}
+        containerColor="#6750A4"
+        iconColor="#fff"
         style={styles.playButton}
         onPress={() =>
           navigation.replace('Gameplay', {
@@ -32,9 +39,7 @@ export default function ReadyUpScreen({ navigation, route }: Props) {
             freeSkipCount,
           })
         }
-      >
-        <Text style={styles.playButtonText}>{'\u25B6'}</Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 }
@@ -45,31 +50,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
+    backgroundColor: '#f6f2ff',
   },
-  info: {
+  card: {
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    paddingVertical: 32,
+    paddingHorizontal: 40,
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 48,
   },
   teamName: {
-    fontSize: 36,
     fontWeight: 'bold',
+    color: '#1c1b1f',
     marginBottom: 8,
   },
   playerName: {
-    fontSize: 24,
-    color: '#666',
+    color: '#79747e',
   },
   playButton: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#4CAF50',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playButtonText: {
-    fontSize: 36,
-    color: '#fff',
-    marginLeft: 4,
   },
 });

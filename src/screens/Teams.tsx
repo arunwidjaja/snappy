@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
-  Button,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import { Text, Button, Surface, IconButton, Divider } from 'react-native-paper';
 import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
@@ -34,7 +33,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
     if (trimmed.length === 0) return;
     const players = Array.from({ length: newPlayerCount }, (_, i) => `Player ${i + 1}`);
     setTeams((prev) => [...prev, { key: String(nextKey++), name: trimmed, players }]);
-    setTeamName(''); //reset text field
+    setTeamName('');
     setNewPlayerCount(2);
   };
 
@@ -88,13 +87,16 @@ export default function AddTeamsScreen({ navigation }: Props) {
 
     return (
       <ScaleDecorator>
-        <View style={[styles.teamCard, isActive && styles.teamRowActive]}>
+        <Surface
+          style={[styles.teamCard, isActive && styles.teamCardActive]}
+          elevation={isActive ? 4 : 1}
+        >
           <TouchableOpacity
             onLongPress={drag}
             disabled={isActive || isEditing}
             style={styles.teamRow}
           >
-            <Text style={styles.dragHandle}>{'\u2261'}</Text>
+            <IconButton icon="drag" size={20} iconColor="#79747e" style={styles.dragHandle} />
 
             {isEditing ? (
               <TextInput
@@ -111,14 +113,20 @@ export default function AddTeamsScreen({ navigation }: Props) {
                 style={styles.nameContainer}
                 onPress={() => startEditing(item)}
               >
-                <Text style={styles.teamName}>{item.name}</Text>
-                <Text style={styles.editIcon}>{'\u270E'}</Text>
+                <Text variant="titleMedium" style={styles.teamName}>{item.name}</Text>
+                <IconButton icon="pencil" size={16} iconColor="#79747e" style={styles.editIcon} />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => removeTeam(item.key)}>
-              <Text style={styles.removeBtn}>{'\u2715'}</Text>
-            </TouchableOpacity>
+            <IconButton
+              icon="close"
+              size={18}
+              iconColor="#c62828"
+              onPress={() => removeTeam(item.key)}
+              style={styles.removeBtn}
+            />
           </TouchableOpacity>
+
+          <Divider style={styles.playerDivider} />
 
           <View style={styles.playerList}>
             {item.players.map((player, index) => {
@@ -142,47 +150,53 @@ export default function AddTeamsScreen({ navigation }: Props) {
                       style={styles.nameContainer}
                       onPress={() => startEditingPlayer(item.key, index)}
                     >
-                      <Text style={styles.playerName}>{player}</Text>
-                      <Text style={styles.editIcon}>{'\u270E'}</Text>
+                      <Text variant="bodyMedium" style={styles.playerName}>{player}</Text>
+                      <IconButton icon="pencil" size={14} iconColor="#79747e" style={styles.editIcon} />
                     </TouchableOpacity>
                   )}
                 </View>
               );
             })}
           </View>
-        </View>
+        </Surface>
       </ScaleDecorator>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Teams</Text>
+      <Text variant="headlineMedium" style={styles.heading}>Teams</Text>
 
-      <View style={styles.inputRow}>
+      <Surface style={styles.inputCard} elevation={2}>
         <TextInput
           style={styles.input}
           value={teamName}
           onChangeText={setTeamName}
           onSubmitEditing={addTeam}
+          placeholder="Team name"
+          placeholderTextColor="#79747e"
         />
-        <View style={styles.playerCountPicker}>
-          <TouchableOpacity
-            style={styles.playerCountBtn}
-            onPress={() => setNewPlayerCount((c) => Math.max(1, c - 1))}
-          >
-            <Text style={styles.playerCountBtnText}>{'\u2212'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.playerCountValue}>{newPlayerCount}</Text>
-          <TouchableOpacity
-            style={styles.playerCountBtn}
-            onPress={() => setNewPlayerCount((c) => Math.min(99, c + 1))}
-          >
-            <Text style={styles.playerCountBtnText}>+</Text>
-          </TouchableOpacity>
+        <View style={styles.inputBottom}>
+          <View style={styles.playerCountPicker}>
+            <IconButton
+              icon="minus"
+              size={18}
+              mode="contained-tonal"
+              onPress={() => setNewPlayerCount((c) => Math.max(1, c - 1))}
+              style={styles.playerCountBtn}
+            />
+            <Text variant="titleMedium" style={styles.playerCountValue}>{newPlayerCount}</Text>
+            <IconButton
+              icon="plus"
+              size={18}
+              mode="contained-tonal"
+              onPress={() => setNewPlayerCount((c) => Math.min(99, c + 1))}
+              style={styles.playerCountBtn}
+            />
+          </View>
+          <Button mode="contained" onPress={addTeam}>Add</Button>
         </View>
-        <Button title="Add Team" onPress={addTeam} />
-      </View>
+      </Surface>
 
       <DraggableFlatList
         data={teams}
@@ -194,7 +208,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
       />
 
       <Button
-        title="Continue"
+        mode="contained"
         disabled={!canContinue}
         onPress={() =>
           navigation.navigate('GameRules', {
@@ -202,94 +216,129 @@ export default function AddTeamsScreen({ navigation }: Props) {
             players: teams.map((t) => t.players),
           })
         }
-      />
+        contentStyle={styles.continueBtnContent}
+        labelStyle={styles.continueBtnLabel}
+      >
+        Continue
+      </Button>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  heading: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
-  input: {
+  container: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginRight: 10,
-    fontSize: 16,
+    padding: 20,
+    paddingTop: 60,
+    backgroundColor: '#f6f2ff',
   },
-  list: { flex: 1, marginBottom: 15 },
-  teamCard: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  heading: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#1c1b1f',
+  },
+  inputCard: {
+    borderRadius: 16,
     backgroundColor: '#fff',
+    padding: 16,
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#1c1b1f',
+    backgroundColor: '#f6f2ff',
+  },
+  inputBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  playerCountPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  playerCountBtn: {
+    margin: 0,
+  },
+  playerCountValue: {
+    fontWeight: 'bold',
+    minWidth: 28,
+    textAlign: 'center',
+    color: '#6750A4',
+  },
+  list: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  teamCard: {
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+  teamCardActive: {
+    backgroundColor: '#f3edf7',
   },
   teamRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    paddingRight: 4,
   },
-  teamRowActive: {
-    backgroundColor: '#f0f0f0',
-    elevation: 4,
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.15)',
+  dragHandle: {
+    margin: 0,
   },
-  dragHandle: { fontSize: 22, color: '#999', marginRight: 12 },
-  teamName: { fontSize: 16, flex: 1 },
-  nameContainer: { flex: 1, flexDirection: 'row', alignItems: 'center' },
-  editIcon: { fontSize: 14, color: '#999', marginLeft: 6 },
+  teamName: {
+    flex: 1,
+    fontWeight: '600',
+    color: '#1c1b1f',
+  },
+  nameContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  editIcon: {
+    margin: 0,
+  },
   editInput: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#007AFF',
+    borderBottomWidth: 2,
+    borderBottomColor: '#6750A4',
     padding: 4,
     fontSize: 16,
+    color: '#1c1b1f',
   },
-  playerCountPicker: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    marginRight: 10,
+  removeBtn: {
+    margin: 0,
   },
-  playerCountBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#e8e8e8',
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-  },
-  playerCountBtnText: {
-    fontSize: 16,
-    fontWeight: 'bold' as const,
-    color: '#555',
-  },
-  playerCountValue: {
-    fontSize: 16,
-    fontWeight: 'bold' as const,
-    minWidth: 28,
-    textAlign: 'center' as const,
-  },
-  playerCountLabel: {
-    fontSize: 13,
-    color: '#888',
-    marginRight: 8,
+  playerDivider: {
+    marginHorizontal: 16,
   },
   playerList: {
-    paddingLeft: 46,
-    paddingBottom: 8,
+    paddingLeft: 48,
+    paddingBottom: 10,
+    paddingTop: 4,
   },
   playerRow: {
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    paddingVertical: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 2,
   },
   playerName: {
-    fontSize: 14,
-    color: '#444',
     flex: 1,
+    color: '#79747e',
   },
-  removeBtn: { fontSize: 18, color: '#e33', paddingHorizontal: 8 },
-  hint: { color: '#999', textAlign: 'center', marginBottom: 10 },
+  continueBtnContent: {
+    paddingVertical: 8,
+  },
+  continueBtnLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });

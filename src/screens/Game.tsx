@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text, Button, IconButton, Surface } from 'react-native-paper';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, PlayedWord } from '../navigation/types';
 import WORDS from '../data/words.json';
@@ -117,37 +118,56 @@ export default function GameplayScreen({ navigation, route }: Props) {
   if (countdown > 0) {
     return (
       <View style={styles.countdownContainer}>
-        <Text style={styles.countdownText}>{countdown}</Text>
+        <Surface style={styles.countdownCircle} elevation={3}>
+          <Text variant="displayLarge" style={styles.countdownText}>{countdown}</Text>
+        </Surface>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.timer}>{timerDisplay}</Text>
+      <Text variant="headlineMedium" style={styles.timer}>{timerDisplay}</Text>
 
-      <View style={styles.wordContainer}>
-        <Text style={styles.word}>{currentEntry.word}</Text>
+      <Surface style={styles.wordCard} elevation={2}>
+        <Text variant="displaySmall" style={styles.word}>{currentEntry.word}</Text>
         {currentEntry.value !== 1 && (
-          <Text style={styles.wordScore}>{currentEntry.value}</Text>
+          <Text variant="titleLarge" style={styles.wordScore}>{currentEntry.value}</Text>
         )}
-      </View>
+      </Surface>
 
       <View style={styles.buttonRow}>
-        <Button title="Skip" onPress={handleSkip} />
-        <Button title="Got It!" onPress={handleGuessed} />
+        <Button
+          mode="outlined"
+          onPress={handleSkip}
+          contentStyle={styles.actionBtnContent}
+          labelStyle={styles.actionBtnLabel}
+        >
+          Skip
+        </Button>
+        <Button
+          mode="contained"
+          onPress={handleGuessed}
+          contentStyle={styles.actionBtnContent}
+          labelStyle={styles.actionBtnLabel}
+        >
+          Got It!
+        </Button>
       </View>
 
       {freeSkipsRemaining !== null && (
-        <Text style={styles.skipsRemaining}>
+        <Text variant="bodyMedium" style={styles.skipsRemaining}>
           Free skips: {freeSkipsRemaining}
         </Text>
       )}
 
       <View style={styles.bottomBar}>
         <View style={styles.bottomSpacer} />
-        <Text style={styles.roundScore}>{roundScore}</Text>
-        <TouchableOpacity
+        <Text variant="displaySmall" style={styles.roundScore}>{roundScore}</Text>
+        <IconButton
+          icon="pause"
+          mode="contained-tonal"
+          size={28}
           style={styles.pauseButton}
           onPress={() =>
             navigation.navigate('Pause', {
@@ -156,9 +176,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
               timeLeft,
             })
           }
-        >
-          <Text style={styles.pauseButtonText}>{'\u23F8'}</Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
@@ -172,36 +190,41 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
-  },
-  currentPlayer: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 4,
+    backgroundColor: '#f6f2ff',
   },
   timer: {
-    fontSize: 36,
     fontWeight: 'bold',
+    color: '#1c1b1f',
   },
-  wordContainer: {
+  wordCard: {
     alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    paddingVertical: 32,
+    paddingHorizontal: 40,
   },
   word: {
-    fontSize: 42,
     fontWeight: 'bold',
+    color: '#1c1b1f',
   },
   wordScore: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#666',
+    color: '#79747e',
     marginTop: 4,
   },
   buttonRow: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 16,
+  },
+  actionBtnContent: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+  },
+  actionBtnLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   skipsRemaining: {
-    fontSize: 16,
-    color: '#666',
+    color: '#79747e',
   },
   bottomBar: {
     flexDirection: 'row',
@@ -213,28 +236,28 @@ const styles = StyleSheet.create({
     width: 50,
   },
   roundScore: {
-    fontSize: 48,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#1c1b1f',
   },
   pauseButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#eee',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pauseButtonText: {
-    fontSize: 24,
+    backgroundColor: '#e8def8',
   },
   countdownContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#f6f2ff',
+  },
+  countdownCircle: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   countdownText: {
-    fontSize: 96,
     fontWeight: 'bold',
+    color: '#6750A4',
   },
 });

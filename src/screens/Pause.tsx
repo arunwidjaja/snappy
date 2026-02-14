@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text, Button, Surface } from 'react-native-paper';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 
@@ -15,28 +16,51 @@ export default function PauseScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.teamTurn}>{currentTeam}'s Turn — {currentPlayer}</Text>
-      <Text style={styles.timer}>{timerDisplay}</Text>
+      <Surface style={styles.card} elevation={2}>
+        <Text variant="titleMedium" style={styles.teamTurn}>
+          {currentTeam}'s Turn — {currentPlayer}
+        </Text>
+        <Text variant="displaySmall" style={styles.timer}>{timerDisplay}</Text>
+      </Surface>
+
       <View style={styles.buttonsSection}>
-        <Button title="Resume" onPress={() => navigation.goBack()} />
+        <Button
+          mode="contained"
+          onPress={() => navigation.goBack()}
+          contentStyle={styles.btnContent}
+          labelStyle={styles.btnLabel}
+        >
+          Resume
+        </Button>
+
         {confirmingQuit ? (
-          <View style={styles.confirmRow}>
-            <Text style={styles.confirmText}>Quit game?</Text>
-            <Button
-              title="Yes, Quit"
-              color="#c62828"
-              onPress={() =>
-                navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
-              }
-            />
-            <Button title="Cancel" onPress={() => setConfirmingQuit(false)} />
-          </View>
+          <Surface style={styles.confirmCard} elevation={1}>
+            <Text variant="titleSmall" style={styles.confirmText}>Quit game?</Text>
+            <View style={styles.confirmRow}>
+              <Button
+                mode="contained"
+                buttonColor="#c62828"
+                textColor="#fff"
+                onPress={() =>
+                  navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
+                }
+              >
+                Yes, Quit
+              </Button>
+              <Button mode="outlined" onPress={() => setConfirmingQuit(false)}>
+                Cancel
+              </Button>
+            </View>
+          </Surface>
         ) : (
           <Button
-            title="Quit Game"
-            color="#c62828"
+            mode="outlined"
+            textColor="#c62828"
             onPress={() => setConfirmingQuit(true)}
-          />
+            style={styles.quitBtn}
+          >
+            Quit Game
+          </Button>
         )}
       </View>
     </View>
@@ -49,28 +73,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    backgroundColor: '#f6f2ff',
+  },
+  card: {
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    paddingVertical: 28,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    marginBottom: 40,
   },
   teamTurn: {
-    fontSize: 20,
-    color: '#555',
-    marginBottom: 10,
+    color: '#79747e',
+    marginBottom: 8,
   },
   timer: {
-    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#1c1b1f',
   },
   buttonsSection: {
-    gap: 15,
-    marginTop: 10,
+    gap: 16,
+    alignItems: 'center',
   },
-  confirmRow: {
-    alignItems: 'center' as const,
-    gap: 10,
+  btnContent: {
+    paddingVertical: 6,
+    paddingHorizontal: 24,
+  },
+  btnLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  quitBtn: {
+    borderColor: '#c62828',
+  },
+  confirmCard: {
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    padding: 20,
+    alignItems: 'center',
+    gap: 12,
   },
   confirmText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    marginBottom: 5,
+    color: '#1c1b1f',
+    fontWeight: '600',
+  },
+  confirmRow: {
+    flexDirection: 'row',
+    gap: 12,
   },
 });

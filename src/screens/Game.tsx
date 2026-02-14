@@ -97,7 +97,12 @@ export default function GameplayScreen({ navigation, route }: Props) {
     <View style={styles.container}>
       <Text style={styles.timer}>{timerDisplay}</Text>
 
-      <Text style={styles.word}>{currentEntry.word}</Text>
+      <View style={styles.wordContainer}>
+        <Text style={styles.word}>{currentEntry.word}</Text>
+        {currentEntry.value !== 1 && (
+          <Text style={styles.wordScore}>{currentEntry.value}</Text>
+        )}
+      </View>
 
       <View style={styles.buttonRow}>
         <Button title="Skip" onPress={handleSkip} />
@@ -140,9 +145,18 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
   },
+  wordContainer: {
+    alignItems: 'center',
+  },
   word: {
     fontSize: 42,
     fontWeight: 'bold',
+  },
+  wordScore: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#666',
+    marginTop: 4,
   },
   buttonRow: {
     flexDirection: 'row',

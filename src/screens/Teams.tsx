@@ -102,7 +102,7 @@ export default function AddTeamsScreen({ navigation }: Props) {
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
-          placeholder="Team Name"
+
           value={teamName}
           onChangeText={setTeamName}
           onSubmitEditing={addTeam}

@@ -145,7 +145,7 @@ export default function GameRulesScreen({ navigation, route }: Props) {
         label="Round Duration"
         values={DURATION_VALUES}
         value={duration}
-        formatLabel={(v) => `${v}s`}
+        formatLabel={(v) => `${v}`}
         onChange={setDuration}
       />
 

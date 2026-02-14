@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
-  Text,
-  Button,
-  TouchableOpacity,
-  Modal,
   FlatList,
   StyleSheet,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from 'react-native';
+import {
+  Text,
+  Button,
+  Surface,
+  Switch,
+  IconButton,
+  Divider,
+} from 'react-native-paper';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 
@@ -17,7 +23,12 @@ const SCORE_LIMIT_VALUES = Array.from({ length: 999 }, (_, i) => i + 1);
 const DURATION_VALUES = Array.from({ length: 199 }, (_, i) => (i + 1) * 5);
 const FREE_SKIPS = [0, 1, 2, 3, 5];
 
-function DropdownPicker({
+const WHEEL_ITEM_HEIGHT = 44;
+const WHEEL_VISIBLE_ITEMS = 3;
+const WHEEL_HEIGHT = WHEEL_ITEM_HEIGHT * WHEEL_VISIBLE_ITEMS;
+const WHEEL_PADDING = WHEEL_ITEM_HEIGHT * Math.floor(WHEEL_VISIBLE_ITEMS / 2);
+
+function InlineWheelPicker({
   label,
   values,
   value,
@@ -30,56 +41,57 @@ function DropdownPicker({
   formatLabel: (v: number) => string;
   onChange: (v: number) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      const idx = Math.round(y / WHEEL_ITEM_HEIGHT);
+      const clamped = Math.max(0, Math.min(idx, values.length - 1));
+      onChange(values[clamped]);
+    },
+    [values, onChange],
+  );
+
+  const initialIndex = Math.max(0, values.indexOf(value));
 
   return (
-    <View style={styles.dropdownRow}>
-      <Text style={styles.dropdownLabel}>{label}</Text>
-      <TouchableOpacity style={styles.dropdownButton} onPress={() => setOpen(true)}>
-        <Text style={styles.dropdownButtonText}>{formatLabel(value)}</Text>
-      </TouchableOpacity>
-      <Modal visible={open} transparent animationType="fade">
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setOpen(false)}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{label}</Text>
-            <FlatList
-              data={values}
-              keyExtractor={(item) => String(item)}
-              initialScrollIndex={Math.max(0, values.indexOf(value))}
-              getItemLayout={(_, index) => ({
-                length: 48,
-                offset: 48 * index,
-                index,
-              })}
-              renderItem={({ item }) => (
-                <TouchableOpacity
+    <View style={styles.wheelSection}>
+      <Text variant="labelLarge" style={styles.wheelLabel}>{label}</Text>
+      <View style={styles.wheelWrapper}>
+        <View style={styles.wheelHighlight} pointerEvents="none" />
+        <FlatList
+          data={values}
+          keyExtractor={(item) => String(item)}
+          showsVerticalScrollIndicator={false}
+          snapToInterval={WHEEL_ITEM_HEIGHT}
+          decelerationRate="fast"
+          onMomentumScrollEnd={handleScroll}
+          onScrollEndDrag={handleScroll}
+          getItemLayout={(_, index) => ({
+            length: WHEEL_ITEM_HEIGHT,
+            offset: WHEEL_ITEM_HEIGHT * index,
+            index,
+          })}
+          initialScrollIndex={initialIndex}
+          contentContainerStyle={{
+            paddingVertical: WHEEL_PADDING,
+          }}
+          renderItem={({ item }) => {
+            const isSelected = item === value;
+            return (
+              <View style={styles.wheelItem}>
+                <Text
                   style={[
-                    styles.modalItem,
-                    item === value && styles.modalItemSelected,
+                    styles.wheelItemText,
+                    isSelected && styles.wheelItemTextSelected,
                   ]}
-                  onPress={() => {
-                    onChange(item);
-                    setOpen(false);
-                  }}
                 >
-                  <Text
-                    style={[
-                      styles.modalItemText,
-                      item === value && styles.modalItemTextSelected,
-                    ]}
-                  >
-                    {formatLabel(item)}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
+                  {formatLabel(item)}
+                </Text>
+              </View>
+            );
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -110,12 +122,14 @@ function CyclePicker({
   };
 
   return (
-    <View style={styles.pickerRow}>
-      <Text style={styles.pickerLabel}>{label}</Text>
-      <View style={styles.pickerControls}>
-        <Button title="<" onPress={prev} />
-        <Text style={styles.pickerValue}>{format(value)}</Text>
-        <Button title=">" onPress={next} />
+    <View style={styles.settingRow}>
+      <View style={styles.settingRowInner}>
+        <Text variant="bodyLarge" style={styles.settingLabel}>{label}</Text>
+        <View style={styles.cycleControls}>
+          <IconButton icon="chevron-left" size={24} onPress={prev} />
+          <Text variant="titleMedium" style={styles.cycleValue}>{format(value)}</Text>
+          <IconButton icon="chevron-right" size={24} onPress={next} />
+        </View>
       </View>
     </View>
   );
@@ -131,47 +145,62 @@ export default function GameRulesScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Game Rules</Text>
+      <Text variant="headlineMedium" style={styles.heading}>Game Rules</Text>
 
-      <DropdownPicker
-        label="Score Limit"
-        values={SCORE_LIMIT_VALUES}
-        value={scoreLimit}
-        formatLabel={(v) => String(v)}
-        onChange={setScoreLimit}
-      />
+      <Surface style={styles.card} elevation={2}>
+        <View style={styles.wheelsRow}>
+          <InlineWheelPicker
+            label="Score Limit"
+            values={SCORE_LIMIT_VALUES}
+            value={scoreLimit}
+            formatLabel={(v) => String(v)}
+            onChange={setScoreLimit}
+          />
 
-      <DropdownPicker
-        label="Round Duration"
-        values={DURATION_VALUES}
-        value={duration}
-        formatLabel={(v) => `${v}`}
-        onChange={setDuration}
-      />
+          <View style={styles.wheelDivider} />
 
-      <View style={styles.toggleRow}>
-        <Text style={styles.toggleLabel}>Free Skips</Text>
-        <TouchableOpacity
-          style={[styles.toggle, freeSkips && styles.toggleOn]}
-          onPress={() => setFreeSkips(prev => !prev)}
-        >
-          <Text style={styles.toggleText}>{freeSkips ? 'ON' : 'OFF'}</Text>
-        </TouchableOpacity>
-      </View>
+          <InlineWheelPicker
+            label="Round Duration"
+            values={DURATION_VALUES}
+            value={duration}
+            formatLabel={(v) => String(v)}
+            onChange={setDuration}
+          />
+        </View>
+      </Surface>
 
-      {!freeSkips && (
-        <CyclePicker
-          label="Free Skips"
-          values={FREE_SKIPS}
-          value={freeSkipCount}
-          format={(v) => String(v)}
-          onChange={setFreeSkipCount}
-        />
-      )}
+      <Surface style={styles.card} elevation={2}>
+        <View style={styles.settingRow}>
+          <View style={styles.settingRowInner}>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" style={styles.settingLabel}>Free Skips</Text>
+              <Text variant="bodySmall" style={styles.settingHint}>
+                {freeSkips ? 'Skips have no penalty' : `${freeSkipCount} free, then -1 per skip`}
+              </Text>
+            </View>
+            <Switch value={freeSkips} onValueChange={setFreeSkips} />
+          </View>
+        </View>
+
+        {!freeSkips && (
+          <>
+            <Divider style={styles.divider} />
+            <CyclePicker
+              label="Free Skips"
+              values={FREE_SKIPS}
+              value={freeSkipCount}
+              format={(v) => String(v)}
+              onChange={setFreeSkipCount}
+            />
+          </>
+        )}
+      </Surface>
 
       <View style={styles.startBtn}>
         <Button
-          title="Start Game"
+          mode="contained"
+          contentStyle={styles.startBtnContent}
+          labelStyle={styles.startBtnLabel}
           onPress={() =>
             navigation.navigate('ReadyUp', {
               teams,
@@ -185,101 +214,120 @@ export default function GameRulesScreen({ navigation, route }: Props) {
               scores: teams.map(() => 0),
             })
           }
-        />
+        >
+          Start Game
+        </Button>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  heading: { fontSize: 28, fontWeight: 'bold', marginBottom: 30, textAlign: 'center' },
-  dropdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  dropdownLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
-  dropdownButton: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  dropdownButtonText: { fontSize: 18, fontWeight: 'bold' },
-  modalOverlay: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 20,
+    paddingTop: 60,
+    backgroundColor: '#f6f2ff',
   },
-  modalContent: {
+  heading: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 24,
+    color: '#1c1b1f',
+  },
+  card: {
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: 'hidden',
     backgroundColor: '#fff',
-    borderRadius: 12,
-    width: '70%',
-    maxHeight: '60%',
+  },
+  wheelsRow: {
+    flexDirection: 'row',
     paddingVertical: 16,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 16,
+  wheelDivider: {
+    width: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
   },
-  modalItem: {
-    height: 48,
+  wheelSection: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  wheelLabel: {
+    color: '#79747e',
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  wheelWrapper: {
+    height: WHEEL_HEIGHT,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  wheelHighlight: {
+    position: 'absolute',
+    top: WHEEL_PADDING,
+    left: 16,
+    right: 16,
+    height: WHEEL_ITEM_HEIGHT,
+    backgroundColor: '#f3edf7',
+    borderRadius: 12,
+    zIndex: 1,
+  },
+  wheelItem: {
+    height: WHEEL_ITEM_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    zIndex: 2,
   },
-  modalItemSelected: {
-    backgroundColor: '#e8f0fe',
+  wheelItemText: {
+    color: '#79747e',
+    fontSize: 18,
   },
-  modalItemText: {
-    fontSize: 16,
-  },
-  modalItemTextSelected: {
+  wheelItemTextSelected: {
+    color: '#6750A4',
     fontWeight: 'bold',
-    color: '#007AFF',
+    fontSize: 22,
   },
-  pickerRow: {
+  settingRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  settingRowInner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  pickerLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
-  pickerControls: { flexDirection: 'row', alignItems: 'center' },
-  pickerValue: { fontSize: 18, fontWeight: 'bold', minWidth: 50, textAlign: 'center' },
-  toggleRow: {
+  settingLabel: {
+    fontWeight: '600',
+    color: '#1c1b1f',
+  },
+  settingHint: {
+    color: '#79747e',
+    marginTop: 2,
+  },
+  divider: {
+    marginHorizontal: 16,
+  },
+  cycleControls: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
-  toggleLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
-  toggle: {
+  cycleValue: {
+    minWidth: 40,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#6750A4',
+  },
+  startBtn: {
+    marginTop: 'auto',
+    paddingBottom: 20,
+  },
+  startBtnContent: {
     paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#f0f0f0',
   },
-  toggleOn: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
-  },
-  toggleText: {
-    fontSize: 16,
+  startBtnLabel: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
-  startBtn: { marginTop: 'auto', paddingBottom: 20 },
 });

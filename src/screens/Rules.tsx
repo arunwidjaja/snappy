@@ -15,7 +15,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'GameRules'>;
 
 const SCORE_LIMIT_VALUES = Array.from({ length: 999 }, (_, i) => i + 1);
 const DURATION_VALUES = Array.from({ length: 199 }, (_, i) => (i + 1) * 5);
-const SKIP_PENALTIES = [0, 1, 2, 3];
 const FREE_SKIPS = [0, 1, 2, 3, 5];
 
 function DropdownPicker({
@@ -127,8 +126,8 @@ export default function GameRulesScreen({ navigation, route }: Props) {
 
   const [scoreLimit, setScoreLimit] = useState(45);
   const [duration, setDuration] = useState(60);
-  const [skipPenalty, setSkipPenalty] = useState(0);
-  const [freeSkips, setFreeSkips] = useState(3);
+  const [freeSkips, setFreeSkips] = useState(true);
+  const [freeSkipCount, setFreeSkipCount] = useState(3);
 
   return (
     <View style={styles.container}>
@@ -150,21 +149,23 @@ export default function GameRulesScreen({ navigation, route }: Props) {
         onChange={setDuration}
       />
 
-      <CyclePicker
-        label="Skip Penalty"
-        values={SKIP_PENALTIES}
-        value={skipPenalty}
-        format={(v) => (v === 0 ? 'None' : `-${v}`)}
-        onChange={setSkipPenalty}
-      />
+      <View style={styles.toggleRow}>
+        <Text style={styles.toggleLabel}>Free Skips</Text>
+        <TouchableOpacity
+          style={[styles.toggle, freeSkips && styles.toggleOn]}
+          onPress={() => setFreeSkips(prev => !prev)}
+        >
+          <Text style={styles.toggleText}>{freeSkips ? 'ON' : 'OFF'}</Text>
+        </TouchableOpacity>
+      </View>
 
-      {skipPenalty !== 0 && (
+      {!freeSkips && (
         <CyclePicker
           label="Free Skips"
           values={FREE_SKIPS}
-          value={freeSkips}
+          value={freeSkipCount}
           format={(v) => String(v)}
-          onChange={setFreeSkips}
+          onChange={setFreeSkipCount}
         />
       )}
 
@@ -176,8 +177,8 @@ export default function GameRulesScreen({ navigation, route }: Props) {
               teams,
               scoreLimit,
               duration,
-              skipPenalty,
               freeSkips,
+              freeSkipCount,
               currentTeamIndex: 0,
               scores: teams.map(() => 0),
             })
@@ -254,5 +255,29 @@ const styles = StyleSheet.create({
   pickerLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
   pickerControls: { flexDirection: 'row', alignItems: 'center' },
   pickerValue: { fontSize: 18, fontWeight: 'bold', minWidth: 50, textAlign: 'center' },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  toggleLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
+  toggle: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f0f0f0',
+  },
+  toggleOn: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  toggleText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
   startBtn: { marginTop: 'auto', paddingBottom: 20 },
 });

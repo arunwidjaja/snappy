@@ -15,7 +15,7 @@ function getRandomEntry(currentWord: string): WordEntry {
 }
 
 export default function GameplayScreen({ navigation, route }: Props) {
-  const { teams, currentTeamIndex, scores, scoreLimit, duration, skipPenalty, freeSkips } =
+  const { teams, currentTeamIndex, scores, scoreLimit, duration, freeSkips, freeSkipCount } =
     route.params;
   const currentTeam = teams[currentTeamIndex];
 
@@ -30,7 +30,10 @@ export default function GameplayScreen({ navigation, route }: Props) {
     playedWordsRef.current = playedWords;
   }, [playedWords]);
 
-  const roundScore = playedWords.reduce((sum, w) => sum + (w.guessed ? w.value : 0), 0);
+  const skipCount = playedWords.filter(w => !w.guessed).length;
+  const penaltySkips = freeSkips ? 0 : Math.max(0, skipCount - freeSkipCount);
+  const roundScore = playedWords.reduce((sum, w) => sum + (w.guessed ? w.value : 0), 0) - penaltySkips;
+  const freeSkipsRemaining = freeSkips ? null : Math.max(0, freeSkipCount - skipCount);
 
   // Pause/resume timer based on screen focus
   useEffect(() => {
@@ -72,8 +75,8 @@ export default function GameplayScreen({ navigation, route }: Props) {
         scores,
         scoreLimit,
         duration,
-        skipPenalty,
         freeSkips,
+        freeSkipCount,
         playedWords: playedWordsRef.current,
       });
     }
@@ -108,6 +111,12 @@ export default function GameplayScreen({ navigation, route }: Props) {
         <Button title="Skip" onPress={handleSkip} />
         <Button title="Got It!" onPress={handleGuessed} />
       </View>
+
+      {freeSkipsRemaining !== null && (
+        <Text style={styles.skipsRemaining}>
+          Free skips: {freeSkipsRemaining}
+        </Text>
+      )}
 
       <View style={styles.bottomBar}>
         <View style={styles.bottomSpacer} />
@@ -161,6 +170,10 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: 20,
+  },
+  skipsRemaining: {
+    fontSize: 16,
+    color: '#666',
   },
   bottomBar: {
     flexDirection: 'row',

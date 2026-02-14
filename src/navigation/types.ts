@@ -2,8 +2,8 @@ export type GameRulesParams = {
   teams: string[];
   scoreLimit: number;
   duration: number;
-  skipPenalty: number;
-  freeSkips: number;
+  freeSkips: boolean;
+  freeSkipCount: number;
 };
 
 export type GameState = GameRulesParams & {

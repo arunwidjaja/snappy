@@ -19,11 +19,7 @@ export type PlayedWord = {
 
 export type PauseParams = {
   currentTeam: string;
-  roundScore: number;
   timeLeft: number;
-  duration: number;
-  teams: string[];
-  scores: number[];
 };
 
 export type RootStackParamList = {

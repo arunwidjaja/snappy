@@ -66,7 +66,7 @@ export default function PauseScreen({ navigation, route }: Props) {
             borderRadius={12}
             onPress={() => setConfirmingQuit(true)}
           >
-            Quit Game
+            Quit
           </AwesomeButton>
         )}
       </View>
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '',
     paddingVertical: 28,
     paddingHorizontal: 40,
     alignItems: 'center',

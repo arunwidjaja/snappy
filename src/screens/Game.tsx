@@ -132,9 +132,7 @@ export default function GameplayScreen({ navigation, route }: Props) {
   if (countdown > 0) {
     return (
       <View style={styles.countdownContainer}>
-        <Surface style={styles.countdownCircle} elevation={3}>
           <Text variant="displayLarge" style={styles.countdownText}>{countdown}</Text>
-        </Surface>
       </View>
     );
   }

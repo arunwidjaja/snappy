@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button, IconButton, Surface } from 'react-native-paper';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList, PlayedWord } from '../navigation/types';
 import WORDS from '../data/words.json';
+import GameTimer from '../components/GameTimer';
+import SkipTokens from '../components/SkipTokens';
 
 type WordEntry = { word: string; value: number };
 
@@ -30,10 +33,25 @@ export default function GameplayScreen({ navigation, route }: Props) {
   const [countdown, setCountdown] = useState(3);
   const playedWordsRef = useRef<PlayedWord[]>([]);
 
+  const wordTranslateY = useSharedValue(30);
+  const wordOpacity = useSharedValue(0);
+  const wordAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: wordTranslateY.value }],
+    opacity: wordOpacity.value,
+  }));
+
   // Keep ref in sync so the timer callback always sees the latest list
   useEffect(() => {
     playedWordsRef.current = playedWords;
   }, [playedWords]);
+
+  // Animate word in from below whenever it changes
+  useEffect(() => {
+    wordTranslateY.value = 30;
+    wordOpacity.value = 0;
+    wordTranslateY.value = withSpring(0, { stiffness: 300, damping: 25 });
+    wordOpacity.value = withTiming(1, { duration: 200 });
+  }, [currentEntry.word]);
 
   const skipCount = playedWords.filter(w => !w.guessed).length;
   const penaltySkips = freeSkips ? 0 : Math.max(0, skipCount - freeSkipCount);
@@ -111,10 +129,6 @@ export default function GameplayScreen({ navigation, route }: Props) {
     setCurrentEntry(prev => getRandomEntry(prev.word));
   }, [currentEntry]);
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
-  const timerDisplay = `${minutes}:${String(seconds).padStart(2, '0')}`;
-
   if (countdown > 0) {
     return (
       <View style={styles.countdownContainer}>
@@ -127,14 +141,14 @@ export default function GameplayScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.timer}>{timerDisplay}</Text>
+      <GameTimer timeLeft={timeLeft} totalTime={duration} />
 
-      <Surface style={styles.wordCard} elevation={2}>
+      <Animated.View style={[styles.wordCard, wordAnimStyle]}>
         <Text variant="displaySmall" style={styles.word}>{currentEntry.word}</Text>
         {currentEntry.value !== 1 && (
           <Text variant="titleLarge" style={styles.wordScore}>{currentEntry.value}</Text>
         )}
-      </Surface>
+      </Animated.View>
 
       <View style={styles.buttonRow}>
         <Button
@@ -156,14 +170,11 @@ export default function GameplayScreen({ navigation, route }: Props) {
       </View>
 
       {freeSkipsRemaining !== null && (
-        <Text variant="bodyMedium" style={styles.skipsRemaining}>
-          Free skips: {freeSkipsRemaining}
-        </Text>
+        <SkipTokens remaining={freeSkipsRemaining} total={freeSkipCount} />
       )}
 
       <View style={styles.bottomBar}>
         <View style={styles.bottomSpacer} />
-        <Text variant="displaySmall" style={styles.roundScore}>{roundScore}</Text>
         <IconButton
           icon="pause"
           mode="contained-tonal"
@@ -192,20 +203,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#f6f2ff',
   },
-  timer: {
-    fontWeight: 'bold',
-    color: '#1c1b1f',
-  },
   wordCard: {
     alignItems: 'center',
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    paddingVertical: 32,
+    paddingVertical: 16,
     paddingHorizontal: 40,
   },
   word: {
-    fontWeight: 'bold',
+    fontWeight: '900',
     color: '#1c1b1f',
+    letterSpacing: -0.5,
   },
   wordScore: {
     color: '#79747e',
@@ -222,9 +228,6 @@ const styles = StyleSheet.create({
   actionBtnLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  skipsRemaining: {
-    color: '#79747e',
   },
   bottomBar: {
     flexDirection: 'row',

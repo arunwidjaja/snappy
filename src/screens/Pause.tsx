@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { Text, Button, Surface } from 'react-native-paper';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import AwesomeButton from "react-native-really-awesome-button";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Pause'>;
 
 export default function PauseScreen({ navigation, route }: Props) {
   const { currentTeam, currentPlayer, timeLeft } = route.params;
   const [confirmingQuit, setConfirmingQuit] = useState(false);
+  const { width } = useWindowDimensions();
+  const buttonWidth = width - 40;
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -24,14 +27,16 @@ export default function PauseScreen({ navigation, route }: Props) {
       </Surface>
 
       <View style={styles.buttonsSection}>
-        <Button
-          mode="contained"
+        <AwesomeButton
+          width={buttonWidth}
+          height={70}
+          backgroundColor="#6750a4"
+          backgroundDarker="#4a3780"
+          borderRadius={12}
           onPress={() => navigation.goBack()}
-          contentStyle={styles.btnContent}
-          labelStyle={styles.btnLabel}
         >
           Resume
-        </Button>
+        </AwesomeButton>
 
         {confirmingQuit ? (
           <Surface style={styles.confirmCard} elevation={1}>
@@ -53,14 +58,16 @@ export default function PauseScreen({ navigation, route }: Props) {
             </View>
           </Surface>
         ) : (
-          <Button
-            mode="outlined"
-            textColor="#c62828"
+          <AwesomeButton
+            width={buttonWidth}
+            height={50}
+            backgroundColor="#c62828"
+            backgroundDarker="#8b0000"
+            borderRadius={12}
             onPress={() => setConfirmingQuit(true)}
-            style={styles.quitBtn}
           >
             Quit Game
-          </Button>
+          </AwesomeButton>
         )}
       </View>
     </View>
@@ -94,17 +101,6 @@ const styles = StyleSheet.create({
   buttonsSection: {
     gap: 16,
     alignItems: 'center',
-  },
-  btnContent: {
-    paddingVertical: 6,
-    paddingHorizontal: 24,
-  },
-  btnLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  quitBtn: {
-    borderColor: '#c62828',
   },
   confirmCard: {
     borderRadius: 12,
